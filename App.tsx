@@ -49,6 +49,15 @@ export default function App() {
   const [isPaused, setIsPaused] = useState(true);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Funzione helper per formattare i secondi in mm:ss
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   // --- LOGICA ---
   const filteredPlaylist = MOCK_PLAYLIST.filter(
@@ -78,10 +87,11 @@ export default function App() {
           }}
           paused={isPaused}
           playInBackground={true}
-          ignoreSilentSwitch={'ignore'}
           style={{width: 0, height: 0}}
-          onLoad={() => console.log('Musica caricata! ✅')}
-          onError={e => console.log('Errore audio:', e)}
+          // Quando il brano viene caricato, scopriamo quanto dura
+          onLoad={data => setDuration(data.duration)}
+          // Ogni 250ms circa, aggiorna la posizione attuale
+          onProgress={data => setCurrentTime(data.currentTime)}
         />
 
         {/* UI: Ricerca */}
@@ -110,13 +120,16 @@ export default function App() {
         </TouchableOpacity>
 
         {/* UI: Player a tutto schermo (Modal) */}
-        <PlayerFull
-          visible={isPlayerVisible}
-          onClose={() => setIsPlayerVisible(false)}
-          song={currentSong}
-          isPaused={isPaused}
-          onTogglePlay={togglePlay}
-        />
+        <PlayerFull 
+  visible={isPlayerVisible} 
+  onClose={() => setIsPlayerVisible(false)} 
+  song={currentSong}
+  currentTime={currentTime}     // Nuova prop
+  duration={duration}           // Nuova prop
+  formatTime={formatTime}       // Nuova prop
+  isPaused={isPaused}           // Passiamo anche lo stato play/pause
+  onTogglePlay={() => setIsPaused(!isPaused)} // Funzione per il tastone centrale
+/>
       </SafeAreaView>
     </SafeAreaProvider>
   );
