@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 
 // Aggiungi l'interfaccia per le Props
 interface MiniPlayerProps {
   title: string;
   artist: string;
+  cover?: string; // Opzionale, in caso vogliamo mostrare l'artwork
 }
 
-const MiniPlayer = ({ title, artist }: MiniPlayerProps) => {
+const MiniPlayer = ({ title, artist, cover }: MiniPlayerProps) => {
   return (
     <View style={styles.container}>
       {/* Barra di progresso (sottile in alto) */}
@@ -17,7 +18,11 @@ const MiniPlayer = ({ title, artist }: MiniPlayerProps) => {
 
       <View style={styles.content}>
         <View style={styles.songInfo}>
-          <View style={styles.albumArtPlaceholder} />
+          {cover ? (
+            <Image source={{ uri: cover }} style={styles.albumArt} />
+          ) : (
+            <View style={styles.albumArtPlaceholder} />
+          )}
           <View>
             <Text style={styles.title}>{title}</Text>
       <Text style={styles.artist}>{artist}</Text>
@@ -69,6 +74,11 @@ const styles = StyleSheet.create({
   songInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  albumArt: {
+    width: 45,
+    height: 45,
+    marginRight: 12,
   },
   albumArtPlaceholder: {
     width: 45,

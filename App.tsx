@@ -124,7 +124,7 @@ export default function App() {
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => setIsPlayerVisible(true)}>
-          <MiniPlayer title={currentSong.title} artist={currentSong.artist} />
+          <MiniPlayer title={currentSong.title} artist={currentSong.artist} cover={currentSong.cover} />
         </TouchableOpacity>
 
         <PlayerFull
