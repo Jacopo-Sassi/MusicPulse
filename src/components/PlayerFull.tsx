@@ -14,11 +14,7 @@ const {width} = Dimensions.get('window');
 interface PlayerFullProps {
   visible: boolean;
   onClose: () => void;
-  song: {
-    title: string;
-    artist: string;
-    cover?: string;
-  };
+  song: {title: string; artist: string; cover?: string};
   currentTime: number;
   duration: number;
   formatTime: (seconds: number) => string;
@@ -36,7 +32,6 @@ const PlayerFull = ({
   isPaused,
   onTogglePlay,
 }: PlayerFullProps) => {
-  // Calcolo della percentuale per la barra di progresso
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
@@ -45,16 +40,14 @@ const PlayerFull = ({
       animationType="slide"
       presentationStyle="fullScreen">
       <View style={styles.container}>
-        {/* Header: Pulsante chiudi e Titolo Playlist */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeIcon}>⌄</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>MUSIC PULSE</Text>
-          <View style={{width: 40}} /> {/* Bilanciatore estetico */}
+          <View style={{width: 40}} />
         </View>
 
-        {/* Copertina Album */}
         <View style={styles.coverContainer}>
           <Image
             source={{
@@ -66,7 +59,6 @@ const PlayerFull = ({
           />
         </View>
 
-        {/* Info Brano */}
         <View style={styles.songDetails}>
           <Text style={styles.title} numberOfLines={1}>
             {song.title}
@@ -74,7 +66,6 @@ const PlayerFull = ({
           <Text style={styles.artist}>{song.artist}</Text>
         </View>
 
-        {/* Timeline e Progress Bar */}
         <View style={styles.timelineArea}>
           <View style={styles.progressBarBg}>
             <View
@@ -87,30 +78,24 @@ const PlayerFull = ({
           </View>
         </View>
 
-        {/* Controlli di riproduzione */}
         <View style={styles.controlsRow}>
           <TouchableOpacity>
             <Text style={styles.secondaryIcon}>shuffle</Text>
           </TouchableOpacity>
-
           <TouchableOpacity>
             <Text style={styles.skipIcon}>⏮</Text>
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
             <Text style={styles.playPauseText}>{isPaused ? '▶' : '⏸'}</Text>
           </TouchableOpacity>
-
           <TouchableOpacity>
             <Text style={styles.skipIcon}>⏭</Text>
           </TouchableOpacity>
-
           <TouchableOpacity>
             <Text style={styles.secondaryIcon}>repeat</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Footer: Icone extra */}
         <View style={styles.footerIcons}>
           <Text style={styles.bottomIcon}>🎧</Text>
           <Text style={styles.bottomIcon}>📋</Text>
@@ -134,66 +119,38 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  closeButton: {
-    padding: 10,
-  },
-  closeIcon: {
-    color: '#fff',
-    fontSize: 35,
-  },
+  closeButton: {padding: 10},
+  closeIcon: {color: '#fff', fontSize: 35},
   headerTitle: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  coverContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
+  coverContainer: {alignItems: 'center', marginVertical: 20},
   albumArt: {
     width: width - 60,
     height: width - 60,
     borderRadius: 8,
     backgroundColor: '#282828',
   },
-  songDetails: {
-    alignItems: 'flex-start',
-    width: '100%',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 26,
-    fontWeight: 'bold',
-  },
-  artist: {
-    color: '#b3b3b3',
-    fontSize: 18,
-    marginTop: 4,
-  },
-  timelineArea: {
-    width: '100%',
-    marginTop: 20,
-  },
+  songDetails: {alignItems: 'flex-start', width: '100%'},
+  title: {color: '#fff', fontSize: 26, fontWeight: 'bold'},
+  artist: {color: '#b3b3b3', fontSize: 18, marginTop: 4},
+  timelineArea: {width: '100%', marginTop: 20},
   progressBarBg: {
     height: 4,
     backgroundColor: '#3e3e3e',
     borderRadius: 2,
     overflow: 'hidden',
   },
-  progressLine: {
-    height: '100%',
-    backgroundColor: '#fff',
-  },
+  progressLine: {height: '100%', backgroundColor: '#fff'},
   timeLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  timeText: {
-    color: '#b3b3b3',
-    fontSize: 12,
-  },
+  timeText: {color: '#b3b3b3', fontSize: 12},
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -208,28 +165,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  playPauseText: {
-    fontSize: 35,
-    color: '#000',
-  },
-  skipIcon: {
-    color: '#fff',
-    fontSize: 35,
-  },
-  secondaryIcon: {
-    color: '#1DB954',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
+  playPauseText: {fontSize: 35, color: '#000'},
+  skipIcon: {color: '#fff', fontSize: 35},
+  secondaryIcon: {color: '#1DB954', fontSize: 12, fontWeight: 'bold'},
   footerIcons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
   },
-  bottomIcon: {
-    color: '#b3b3b3',
-    fontSize: 20,
-  },
+  bottomIcon: {color: '#b3b3b3', fontSize: 20},
 });
 
 export default PlayerFull;
