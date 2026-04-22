@@ -121,11 +121,25 @@ export default function App() {
           contentContainerStyle={styles.listPadding}
         />
 
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setIsPlayerVisible(true)}>
-          <MiniPlayer title={currentSong.title} artist={currentSong.artist} cover={currentSong.cover} />
-        </TouchableOpacity>
+       <TouchableOpacity 
+  activeOpacity={0.9} 
+  onPress={() => setIsPlayerVisible(true)}
+>
+  <MiniPlayer 
+    title={currentSong.title} 
+    artist={currentSong.artist}
+    cover={currentSong.cover}
+    isPaused={isPaused} 
+    onTogglePlay={(e) => {
+      e.stopPropagation(); // Impedisce l'apertura del PlayerFull
+      setIsPaused(!isPaused);
+    }}
+    onNext={(e) => {
+      e.stopPropagation();
+      playNext();
+    }}
+  />
+</TouchableOpacity>
 
         <PlayerFull
           visible={isPlayerVisible}

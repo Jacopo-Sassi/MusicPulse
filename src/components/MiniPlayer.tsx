@@ -1,43 +1,60 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 
-// Aggiungi l'interfaccia per le Props
 interface MiniPlayerProps {
   title: string;
   artist: string;
-  cover?: string; // Opzionale, in caso vogliamo mostrare l'artwork
+  cover?: string;
+  isPaused?: boolean;
+  onTogglePlay?: (e: any) => void; // Aggiunto 'e' per lo stopPropagation
+  onNext?: (e: any) => void;
+  onPrevious?: (e: any) => void;
 }
 
-const MiniPlayer = ({ title, artist, cover }: MiniPlayerProps) => {
+const MiniPlayer = ({
+  title,
+  artist,
+  cover,
+  isPaused,
+  onTogglePlay,
+  onNext,
+  onPrevious,
+}: MiniPlayerProps) => {
   return (
     <View style={styles.container}>
-      {/* Barra di progresso (sottile in alto) */}
+      {/* Barra di progresso sottilissima */}
       <View style={styles.progressBar}>
-        <View style={[styles.progressLine, { width: '40%' }]} />
+        <View style={[styles.progressLine, {width: '40%'}]} />
       </View>
 
       <View style={styles.content}>
         <View style={styles.songInfo}>
           {cover ? (
-            <Image source={{ uri: cover }} style={styles.albumArt} />
+            <Image source={{uri: cover}} style={styles.albumArt} />
           ) : (
             <View style={styles.albumArtPlaceholder} />
           )}
-          <View>
-            <Text style={styles.title}>{title}</Text>
-      <Text style={styles.artist}>{artist}</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.title} numberOfLines={1}>
+              {title}
+            </Text>
+            <Text style={styles.artist} numberOfLines={1}>
+              {artist}
+            </Text>
           </View>
         </View>
 
         <View style={styles.controls}>
-          <TouchableOpacity style={styles.controlButton}>
-            <Text style={styles.icon}>⏮</Text>
+          <TouchableOpacity onPress={onPrevious} style={styles.controlBtn}>
+            <Text style={styles.skipIcon}>⏮</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.playButton}>
-            <Text style={styles.playIcon}>▶</Text>
+
+          <TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
+            <Text style={styles.playPauseIcon}>{isPaused ? '▶' : '⏸'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.controlButton}>
-            <Text style={styles.icon}>⏭</Text>
+
+          <TouchableOpacity onPress={onNext} style={styles.controlBtn}>
+            <Text style={styles.skipIcon}>⏭</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -47,79 +64,87 @@ const MiniPlayer = ({ title, artist, cover }: MiniPlayerProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute', // Esce dal flusso della lista e si ancora allo schermo
-    bottom: 0,            // Si attacca al fondo
+    position: 'absolute',
+    bottom: 0,
     width: '100%',
     backgroundColor: '#282828',
-    height: 70,
+    height: 75, // Leggermente più alto per respirare meglio
     borderTopWidth: 1,
     borderTopColor: '#333',
+    elevation: 10, // Ombra per Android
   },
   progressBar: {
     height: 2,
-    backgroundColor: '#555',
+    backgroundColor: '#444',
     width: '100%',
   },
   progressLine: {
     height: '100%',
-    backgroundColor: '#1DB954', // Verde MusicPulse
+    backgroundColor: '#1DB954',
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
-    height: '100%',
+    flex: 1, // Prende tutto lo spazio sotto la barra
   },
   songInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1, // Permette ai testi di occupare lo spazio disponibile
+  },
+  textContainer: {
+    marginLeft: 12,
+    maxWidth: '65%', // Evita che il testo finisca sopra i bottoni
   },
   albumArt: {
-    width: 45,
-    height: 45,
-    marginRight: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 4,
   },
   albumArtPlaceholder: {
-    width: 45,
-    height: 45,
+    width: 48,
+    height: 48,
     backgroundColor: '#444',
     borderRadius: 4,
-    marginRight: 12,
   },
   title: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   artist: {
     color: '#b3b3b3',
     fontSize: 12,
+    marginTop: 2,
   },
   controls: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 10,
   },
-  controlButton: {
-    padding: 10,
+  controlBtn: {
+    padding: 8, // Area di tocco più grande
+  },
+  skipIcon: {
+    color: '#fff',
+    fontSize: 22, // Ridotto da 35 (troppo grande)
   },
   playButton: {
     backgroundColor: '#fff',
-    width: 35,
-    height: 35,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 8,
   },
-  icon: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  playIcon: {
+  playPauseIcon: {
+    fontSize: 18, // Ridotto da 35 per stare nel cerchio
     color: '#000',
-    fontSize: 14,
-    marginLeft: 2, // Piccola correzione ottica per centrare il triangolo
+    // Correzione ottica: il Play sembra sempre un po' a sinistra
+    paddingLeft: 2,
   },
 });
 
