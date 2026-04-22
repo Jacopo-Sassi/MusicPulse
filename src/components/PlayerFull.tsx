@@ -20,6 +20,8 @@ interface PlayerFullProps {
   formatTime: (seconds: number) => string;
   isPaused: boolean;
   onTogglePlay: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
 const PlayerFull = ({
@@ -30,7 +32,8 @@ const PlayerFull = ({
   duration,
   formatTime,
   isPaused,
-  onTogglePlay,
+  onTogglePlay,onNext,
+  onPrevious
 }: PlayerFullProps) => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -82,15 +85,17 @@ const PlayerFull = ({
           <TouchableOpacity>
             <Text style={styles.secondaryIcon}>shuffle</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.skipIcon}>⏮</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
-            <Text style={styles.playPauseText}>{isPaused ? '▶' : '⏸'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.skipIcon}>⏭</Text>
-          </TouchableOpacity>
+          <TouchableOpacity onPress={onPrevious}>
+  <Text style={styles.skipIcon}>⏮</Text>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
+  <Text style={styles.playPauseText}>{isPaused ? '▶' : '⏸'}</Text>
+</TouchableOpacity>
+
+<TouchableOpacity onPress={onNext}>
+  <Text style={styles.skipIcon}>⏭</Text>
+</TouchableOpacity>
           <TouchableOpacity>
             <Text style={styles.secondaryIcon}>repeat</Text>
           </TouchableOpacity>
