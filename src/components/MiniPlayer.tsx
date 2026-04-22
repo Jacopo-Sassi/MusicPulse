@@ -5,7 +5,10 @@ interface MiniPlayerProps {
   title: string;
   artist: string;
   cover?: string;
-  isPaused?: boolean;
+  isPaused: boolean;
+  currentTime: number; // Aggiunto per mostrare il tempo attuale
+  duration: number; // Aggiunto per mostrare la durata totale
+  formatTime?: (seconds: number) => string; // Aggiunto per formattare il tempo
   onTogglePlay?: (e: any) => void; // Aggiunto 'e' per lo stopPropagation
   onNext?: (e: any) => void;
   onPrevious?: (e: any) => void;
@@ -19,12 +22,17 @@ const MiniPlayer = ({
   onTogglePlay,
   onNext,
   onPrevious,
+  currentTime,
+  duration,
+  formatTime,
 }: MiniPlayerProps) => {
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   return (
     <View style={styles.container}>
-      {/* Barra di progresso sottilissima */}
+      {/* Ora la barra è dinamica! */}
       <View style={styles.progressBar}>
-        <View style={[styles.progressLine, {width: '40%'}]} />
+        <View style={[styles.progressLine, {width: `${progressPercent}%`}]} />
       </View>
 
       <View style={styles.content}>
