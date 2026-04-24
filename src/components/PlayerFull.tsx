@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  Animated,
 } from 'react-native';
 
 const {width} = Dimensions.get('window');
@@ -39,6 +40,14 @@ const PlayerFull = ({
   onSeek,
 }: PlayerFullProps) => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const albumAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(albumAnim, {
+      toValue: isPaused ? 0.8 : 1, // Si rimpicciolisce al 80% se in pausa
+      useNativeDriver: true,
+    }).start();
+  }, [isPaused]);
 
   return (
     <Modal
@@ -55,13 +64,16 @@ const PlayerFull = ({
         </View>
 
         <View style={styles.coverContainer}>
-          <Image
+          <Animated.Image
             source={{
               uri:
                 song.cover ||
                 'https://placehold.co/600/282828/fff?text=MusicPulse',
             }}
-            style={styles.albumArt}
+            style={[
+              styles.albumArt,
+              {transform: [{scale: albumAnim}]}, // Animazione di scala per effetto "pulsante"
+            ]}
           />
         </View>
 

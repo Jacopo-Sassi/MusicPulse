@@ -28,3 +28,8 @@ Performance optimization
 Spotify authentication (OAuth2)
 Music player
 Search functionality
+
+Challenges
+API Limitations: "Spotify API currently restricts preview_url for many major label tracks in certain regions. I implemented a filtering system to ensure the UI only displays playable tracks, maintaining a seamless user experience."
+
+Libraries Compatibility
