@@ -24,8 +24,7 @@ Application architecture
 Feature development
 Performance optimization
 
-📱 Features (in progress)
-Spotify authentication (OAuth2)
+📱 Features
 Music player
 Search functionality
 
