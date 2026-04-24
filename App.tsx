@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import Video from 'react-native-video';
-
+import {getSpotifyToken} from './src/services/spotifyApi';
 import {usePlayerStore} from './src/store/usePlayerStore';
 import HomeScreen from './src/screens/HomeScreen';
 import SearchScreen from './src/screens/SearchScreen';
@@ -31,6 +31,18 @@ export default function App() {
     setDuration,
     setCurrentTime,
   } = usePlayerStore();
+
+  useEffect(() => {
+    const initSpotify = async () => {
+      console.log('Inizializzazione Spotify...');
+      const token = await getSpotifyToken();
+      if (token) {
+        console.log('Spotify pronto! Token ricevuto.');
+      }
+    };
+
+    initSpotify();
+  }, []);
 
   return (
     <SafeAreaProvider>
