@@ -88,12 +88,21 @@ export default function App() {
     setCurrentTime(0); // <--- Reset della barra quando cambi brano
   };
 
+  const videoRef = useRef<React.ElementRef<typeof Video>>(null);
+
+  // 2. Funzione per saltare il tempo
+  const handleSeek = (time: number) => {
+    videoRef.current?.seek(time); // Comanda al video di andare al secondo X
+    setCurrentTime(time); // Aggiorna lo stato per rifletterlo subito sulla UI
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" />
 
         <Video
+          ref={videoRef}
           source={{uri: currentSong.url}}
           paused={isPaused}
           playInBackground={true}
@@ -154,6 +163,7 @@ export default function App() {
           onTogglePlay={() => setIsPaused(!isPaused)}
           onNext={playNext} // <--- NUOVA PROP
           onPrevious={playPrevious} // <--- NUOVA PROP
+          onSeek={handleSeek}
         />
       </SafeAreaView>
     </SafeAreaProvider>

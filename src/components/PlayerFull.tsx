@@ -22,6 +22,7 @@ interface PlayerFullProps {
   onTogglePlay: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  onSeek: (time: number) => void;
 }
 
 const PlayerFull = ({
@@ -32,8 +33,10 @@ const PlayerFull = ({
   duration,
   formatTime,
   isPaused,
-  onTogglePlay,onNext,
-  onPrevious
+  onTogglePlay,
+  onNext,
+  onPrevious,
+  onSeek,
 }: PlayerFullProps) => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -69,12 +72,33 @@ const PlayerFull = ({
           <Text style={styles.artist}>{song.artist}</Text>
         </View>
 
+        {/* Timeline e Progress Bar Interattiva */}
         <View style={styles.timelineArea}>
-          <View style={styles.progressBarBg}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.progressBarBg}
+            onPress={e => {
+              // Calcolo della posizione del tocco
+              const touchX = e.nativeEvent.locationX; // Coordinata X del tocco sulla barra
+              const barWidth = width - 50; // Larghezza totale della barra (calcolata dai padding)
+
+              // Proporzione: (tocco / larghezza) * durata totale
+              const newTime = (touchX / barWidth) * duration;
+
+              if (newTime >= 0 && newTime <= duration) {
+                onSeek(newTime);
+              }
+            }}>
             <View
               style={[styles.progressLine, {width: `${progressPercent}%`}]}
             />
-          </View>
+
+            {/* Pallino dello slider (opzionale per estetica) */}
+            <View
+              style={[styles.progressKnob, {left: `${progressPercent}%`}]}
+            />
+          </TouchableOpacity>
+
           <View style={styles.timeLabels}>
             <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
             <Text style={styles.timeText}>{formatTime(duration)}</Text>
@@ -86,16 +110,16 @@ const PlayerFull = ({
             <Text style={styles.secondaryIcon}>shuffle</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onPrevious}>
-  <Text style={styles.skipIcon}>⏮</Text>
-</TouchableOpacity>
+            <Text style={styles.skipIcon}>⏮</Text>
+          </TouchableOpacity>
 
-<TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
-  <Text style={styles.playPauseText}>{isPaused ? '▶' : '⏸'}</Text>
-</TouchableOpacity>
+          <TouchableOpacity style={styles.playButton} onPress={onTogglePlay}>
+            <Text style={styles.playPauseText}>{isPaused ? '▶' : '⏸'}</Text>
+          </TouchableOpacity>
 
-<TouchableOpacity onPress={onNext}>
-  <Text style={styles.skipIcon}>⏭</Text>
-</TouchableOpacity>
+          <TouchableOpacity onPress={onNext}>
+            <Text style={styles.skipIcon}>⏭</Text>
+          </TouchableOpacity>
           <TouchableOpacity>
             <Text style={styles.secondaryIcon}>repeat</Text>
           </TouchableOpacity>
@@ -144,16 +168,28 @@ const styles = StyleSheet.create({
   artist: {color: '#b3b3b3', fontSize: 18, marginTop: 4},
   timelineArea: {width: '100%', marginTop: 20},
   progressBarBg: {
-    height: 4,
+    height: 6, // Leggermente più alta per facilitare il tocco
     backgroundColor: '#3e3e3e',
-    borderRadius: 2,
-    overflow: 'hidden',
+    borderRadius: 3,
+    justifyContent: 'center', // Centra la linea interna
   },
-  progressLine: {height: '100%', backgroundColor: '#fff'},
+  progressLine: {
+    height: '100%',
+    backgroundColor: '#1DB954', // Verde Spotify
+    borderRadius: 3,
+  },
+  progressKnob: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    marginLeft: -6, // Centra il pallino sulla fine della linea
+  },
   timeLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    flexDirection: 'row', // Mette i due testi sulla stessa riga
+    justifyContent: 'space-between', // Spinge uno a sinistra e uno a destra
+    marginTop: 10, // Distanza dalla barra di progresso
   },
   timeText: {color: '#b3b3b3', fontSize: 12},
   controlsRow: {
