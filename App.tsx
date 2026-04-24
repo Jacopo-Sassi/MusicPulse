@@ -1,20 +1,18 @@
-import React, {useState, useRef} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  StatusBar,
-  TouchableOpacity,
-} from 'react-native';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet, FlatList, StatusBar, TouchableOpacity } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 
+// Hooks e Store
+import { usePlayerStore } from './src/store/usePlayerStore';
+
+// Componenti
 import SongCard from './src/components/SongCard';
 import MiniPlayer from './src/components/MiniPlayer';
 import PlayerFull from './src/components/PlayerFull';
 import SearchBar from './src/components/SearchBar';
 
-const MOCK_PLAYLIST = [
+const MOCK_DATA = [
   {
     id: '1',
     title: 'Midnight Drive',
@@ -48,129 +46,103 @@ const MOCK_PLAYLIST = [
     url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
   },
 ];
-
 export default function App() {
-  const [currentSong, setCurrentSong] = useState(MOCK_PLAYLIST[0]);
-  const [isPaused, setIsPaused] = useState(true);
-  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // --- NUOVI STATI PER IL TEMPO --- //
-  const [currentTime, setCurrentTime] = useState(0); // <--- Secondi attuali
-  const [duration, setDuration] = useState(0); // <--- Durata totale
-
-  // Funzione per formattare i secondi (es. 125 -> 2:05)
-  const formatTime = (seconds: number) => {
-    // <--- Funzione helper
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  // Trova l'indice della canzone attuale
-  const currentIndex = MOCK_PLAYLIST.findIndex(s => s.id === currentSong.id);
-
-  const playNext = () => {
-    const nextIndex = (currentIndex + 1) % MOCK_PLAYLIST.length;
-    playSong(MOCK_PLAYLIST[nextIndex]);
-  };
-
-  const playPrevious = () => {
-    // Se siamo all'inizio, torna all'ultima canzone
-    const prevIndex =
-      (currentIndex - 1 + MOCK_PLAYLIST.length) % MOCK_PLAYLIST.length;
-    playSong(MOCK_PLAYLIST[prevIndex]);
-  };
-
-  const playSong = (song: any) => {
-    setCurrentSong(song);
-    setIsPaused(false);
-    setCurrentTime(0); // <--- Reset della barra quando cambi brano
-  };
-
   const videoRef = useRef<React.ElementRef<typeof Video>>(null);
+  
+  // Estraiamo tutto quello che ci serve dallo Store
+  const { 
+    currentSong, isPaused, currentTime, duration,
+    setCurrentSong, setPaused, setDuration, setCurrentTime,
+    togglePlay, playNext, playPrevious, setPlaylist
+  } = usePlayerStore();
 
-  // 2. Funzione per saltare il tempo
-  const handleSeek = (time: number) => {
-    videoRef.current?.seek(time); // Comanda al video di andare al secondo X
-    setCurrentTime(time); // Aggiorna lo stato per rifletterlo subito sulla UI
-  };
+  const [isPlayerVisible, setIsPlayerVisible] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  // Inizializziamo la playlist nello store al caricamento
+  useEffect(() => {
+    setPlaylist(MOCK_DATA);
+    if (!currentSong) setCurrentSong(MOCK_DATA[0]);
+  }, []);
+
+  const filteredPlaylist = MOCK_DATA.filter(s => 
+    s.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" />
 
-        <Video
-          ref={videoRef}
-          source={{uri: currentSong.url}}
-          paused={isPaused}
-          playInBackground={true}
-          style={{width: 0, height: 0}}
-          onLoad={data => setDuration(data.duration)}
-          onProgress={data => setCurrentTime(data.currentTime)}
-          onEnd={playNext} // <--- ECCO LA MAGIA: Passa alla prossima quando finisce!
-        />
+        {currentSong && (
+          <Video
+            ref={videoRef}
+            source={{ uri: currentSong.url }}
+            paused={isPaused}
+            playInBackground={true}
+            style={{ width: 0, height: 0 }}
+            onLoad={(data) => setDuration(data.duration)}
+            onProgress={(data) => setCurrentTime(data.currentTime)}
+            onEnd={playNext}
+          />
+        )}
 
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
         <FlatList
-          data={MOCK_PLAYLIST.filter(s =>
-            s.title.toLowerCase().includes(searchQuery.toLowerCase()),
-          )}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <SongCard
-              title={item.title}
-              artist={item.artist}
+          data={filteredPlaylist}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <SongCard 
+              title={item.title} 
+              artist={item.artist} 
               coverUrl={item.cover}
-              onPress={() => playSong(item)}
+              onPress={() => setCurrentSong(item)}
             />
           )}
           contentContainerStyle={styles.listPadding}
         />
 
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => setIsPlayerVisible(true)}>
-          <MiniPlayer
-            title={currentSong.title}
-            artist={currentSong.artist}
-            cover={currentSong.cover}
-            isPaused={isPaused}
-            currentTime={currentTime} // <--- Passa il tempo attuale
-            duration={duration} // <--- Passa la durata totale
-            formatTime={formatTime} // <--- Passa la funzione di formattazione
-            onTogglePlay={e => {
-              e.stopPropagation(); // Impedisce l'apertura del PlayerFull
-              setIsPaused(!isPaused);
-            }}
-            onNext={e => {
-              e.stopPropagation();
-              playNext();
-            }}
-          />
-        </TouchableOpacity>
+        {currentSong && (
+          <TouchableOpacity activeOpacity={0.9} onPress={() => setIsPlayerVisible(true)}>
+            <MiniPlayer 
+              title={currentSong.title} 
+              artist={currentSong.artist}
+              cover={currentSong.cover}
+              isPaused={isPaused}
+              currentTime={currentTime}
+              duration={duration}
+              onTogglePlay={(e) => { e.stopPropagation(); togglePlay(); }}
+              onNext={(e) => { e.stopPropagation(); playNext(); }}
+            />
+          </TouchableOpacity>
+        )}
 
-        <PlayerFull
-          visible={isPlayerVisible}
-          onClose={() => setIsPlayerVisible(false)}
-          song={currentSong}
-          currentTime={currentTime}
-          duration={duration}
-          formatTime={formatTime}
-          isPaused={isPaused}
-          onTogglePlay={() => setIsPaused(!isPaused)}
-          onNext={playNext} // <--- NUOVA PROP
-          onPrevious={playPrevious} // <--- NUOVA PROP
-          onSeek={handleSeek}
-        />
+        {currentSong && (
+          <PlayerFull 
+            visible={isPlayerVisible} 
+            onClose={() => setIsPlayerVisible(false)} 
+            song={currentSong}
+            currentTime={currentTime}
+            duration={duration}
+            formatTime={(s) => {
+              const mins = Math.floor(s / 60);
+              const secs = Math.floor(s % 60);
+              return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }}
+            isPaused={isPaused}
+            onTogglePlay={togglePlay}
+            onNext={playNext}
+            onPrevious={playPrevious}
+            onSeek={(time) => videoRef.current?.seek(time)}
+          />
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#121212'},
-  listPadding: {paddingBottom: 100},
+  container: { flex: 1, backgroundColor: '#121212' },
+  listPadding: { paddingBottom: 100 },
 });
