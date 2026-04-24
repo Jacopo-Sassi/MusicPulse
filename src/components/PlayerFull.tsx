@@ -55,6 +55,7 @@ const PlayerFull = ({
       animationType="slide"
       presentationStyle="fullScreen">
       <View style={styles.container}>
+        <View style={styles.backgroundGlow} />
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeIcon}>⌄</Text>
@@ -227,6 +228,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   bottomIcon: {color: '#b3b3b3', fontSize: 20},
+  backgroundGlow: {
+    position: 'absolute',
+    top: -width * 0.2,
+    width: width * 1.5,
+    height: width * 1.5,
+    borderRadius: width * 0.75,
+    backgroundColor: '#1DB954',
+    opacity: 0.1,
+    alignSelf: 'center',
+  },
 });
 
 export default PlayerFull;
