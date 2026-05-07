@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native'; // <--- Aggiungi Text qui
+import {View, TextInput, StyleSheet, Text} from 'react-native'; // <--- Aggiungi Text qui
 
 interface SearchBarProps {
   value: string;
   onChange: (text: string) => void;
 }
 
-const SearchBar = ({ value, onChange }: SearchBarProps) => {
+const SearchBar = ({value, onChange}: SearchBarProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
         {/* Usa il Text di React Native con la T maiuscola */}
-        <Text style={styles.icon}>🔍</Text> 
+        <Text style={styles.icon}>🔍</Text>
         <TextInput
           style={styles.input}
           placeholder="Cerca brani o artisti..."
